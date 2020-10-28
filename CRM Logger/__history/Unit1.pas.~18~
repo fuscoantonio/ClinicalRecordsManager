@@ -1,0 +1,319 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, IdBaseComponent, IdComponent,
+  IdCustomTCPServer, IdTCPServer, IdContext, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.ComCtrls, IniFiles, DBAccess, Ora, Data.DB, OraCall, Vcl.Grids, System.IOUtils;
+
+type
+  TServerLogger = class(TForm)
+    Background: TImage;
+    IdTCPServer1: TIdTCPServer;
+    UnsentLogs: TButton;
+    OraSQL1: TOraSQL;
+    OraSession1: TOraSession;
+    DumpLogs: TButton;
+    DumpLogsByDate: TButton;
+    StringGrid1: TStringGrid;
+    ShowLogs: TButton;
+    Button1: TButton;
+    Button2: TButton;
+    Memo1: TMemo;
+    procedure FormCreate(Sender: TObject);
+    procedure IdTCPServer1Execute(AContext: TIdContext);
+    procedure ComponentsCreator(secname: string);
+    procedure ComponentsDestroyer;
+    procedure SQLGenerator(secName:string; keyName:string; hasParameters:boolean);
+    procedure UnsentLogsClick(Sender: TObject);
+    procedure DumpLogsClick(Sender: TObject);
+    procedure DumpLogsByDateClick(Sender: TObject);
+    procedure ReadIntoGrid(aSection: string;const aGrid: TStringGrid);
+    procedure ShowLogsClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+  private
+    ini: TIniFile;
+    ini_path: string;
+    logs_path: string;
+    logs: TIniFile;
+    isUnsentLogsActive: boolean;
+    iniIncoming: boolean;
+    const
+      LOGS_MENU = 'LOGSMENU';
+      LOGS_SEC = 'LOGS';
+      INI_UTIL = 'INI_UTIL';
+      SAVE_INI_LOGGER = 'SAVE_INI_LOGGER';
+      DELETE_INI_LOGGER = 'DELETE_INI_LOGGER';
+      INI_END_LINE = 'end_ini';
+      DUMP_LOGS = 'DUMPLOGS';
+      DUMP_LOGS_BYDATE = 'DUMPLOGSBYDATE';
+  public
+    { Public declarations }
+  end;
+
+var
+  ServerLogger: TServerLogger;
+
+implementation
+
+{$R *.dfm}
+
+function StringToComponentProc(Value: string): TComponent;
+var
+  StrStream:TStringStream;
+  BinStream:TMemoryStream;
+begin
+  StrStream := TStringStream.Create(Value);
+  try
+    BinStream := TMemoryStream.Create;
+    try
+      ObjectTextToBinary(StrStream, BinStream);
+      BinStream.Seek(0, soFromBeginning);
+      Result:= BinStream.ReadComponent(nil);
+    finally
+      BinStream.Free;
+    end;
+  finally
+    StrStream.Free;
+  end;
+end;
+
+procedure TServerLogger.ShowLogsClick(Sender: TObject);
+begin
+  ReadIntoGrid(LOGS_SEC, StringGrid1);
+end;
+
+procedure TServerLogger.Button1Click(Sender: TObject);
+var
+  str: string; log_list:TStringList; param:TParam;
+begin
+  try
+    SQLGenerator(INI_UTIL, DELETE_INI_LOGGER, false);
+    log_list := TStringList.Create;
+    log_list.LoadFromFile(ini_path);
+
+    OraSQL1.SQL.Text := ini.ReadString(INI_UTIL, SAVE_INI_LOGGER, '---');
+    param := OraSQL1.FindParam('line');
+
+    for str in log_list do
+    begin
+      memo1.Lines.Add(str);
+      param.Value := str;
+      OraSQL1.Execute;
+      OraSession1.Commit;
+    end;
+    param.Value := INI_END_LINE;
+    OraSQL1.Execute;
+    OraSession1.Commit;
+  finally
+    log_list.Free;
+  end;
+end;
+
+procedure TServerLogger.Button2Click(Sender: TObject);
+begin
+  iniIncoming := true;
+  OraSQL1.SQL.Text := 'begin ini_util.send_ini_logger; end;';
+  OraSQL1.Execute;
+  OraSession1.Commit;
+end;
+
+
+procedure TServerLogger.ComponentsCreator(secName: string);
+var
+  comp_list:TStringList; i:integer; comp:TControl;
+begin
+  comp_list := TStringList.Create;
+
+  try
+    ini.ReadSectionValues(secName, comp_list);
+
+    for i := 0 to comp_list.Count-1 do
+    begin
+      comp := StringToComponentProc(comp_list.ValueFromIndex[i]) as TControl;
+      comp.Parent := Self;
+      comp.Visible := TRUE;
+      self.InsertComponent(comp);
+    end;
+  finally
+    comp_list.Free;
+  end;
+
+end;
+
+procedure TServerLogger.ComponentsDestroyer;
+var
+  i:integer; comp_list:TStringList;
+begin
+  comp_list := TStringList.Create;
+
+  try
+    for i := self.ComponentCount-1 downto 0 do
+    begin
+      if (self.Components[i] is TEdit) or (self.Components[i] is TDateTimePicker) then
+      begin
+        self.Components[i].Free;
+      end;
+    end;
+
+    DumpLogs.Visible := false;
+    DumpLogsByDate.Visible := false;
+  finally
+    comp_list.Free;
+  end;
+
+end;
+
+procedure TServerLogger.DumpLogsClick(Sender: TObject);
+begin
+  SQLGenerator(LOGS_SEC,DUMP_LOGS,false);
+end;
+
+procedure TServerLogger.DumpLogsByDateClick(Sender: TObject);
+begin
+  SQLGenerator(LOGS_SEC,DUMP_LOGS_BYDATE,true);
+end;
+
+procedure TServerLogger.SQLGenerator(secName:string; keyName:string; hasParameters:boolean);
+var
+  i:integer; param:TParam; comp:TControl;
+begin
+  OraSQL1.SQL.Text:=ini.ReadString(secName,keyName,'---');
+
+  if hasParameters then
+  begin
+    for i := 0 to self.ComponentCount-1 do
+    begin
+      if self.Components[i] is TControl then
+      begin
+        comp := self.Components[i] as TControl;
+        param := OraSQL1.Params.FindParam(comp.Name);
+      end;
+      if (self.components[i] is TEdit) and (param <> nil) then
+      begin
+        param.Value := (comp as TEdit).Text;
+      end
+      else if (self.Components[i] is TDateTimePicker) and (param <> nil) then
+      begin
+        param.AsDate := (comp as TDateTimePicker).Date
+      end;
+    end;
+  end;
+
+  OraSQL1.Execute;
+  OraSession1.Commit;
+end;
+
+procedure TServerLogger.UnsentLogsClick(Sender: TObject);
+begin
+  if isUnsentLogsActive then
+  begin
+    ComponentsDestroyer;
+    isUnsentLogsActive := false;
+  end
+  {else if isAnyMenuActive then
+  begin
+    ComponentsDestroyer;
+    isUnsentLogsActive := true;
+    ComponentsCreator('LOGSMENU');
+    DumpLogs.Visible := true;
+    DumpLogsByDate.Visible := true;
+  end}
+  else
+  begin
+    isUnsentLogsActive := true;
+    ComponentsCreator(LOGS_MENU);
+    DumpLogs.Visible := true;
+    DumpLogsByDate.Visible := true;
+  end;
+end;
+
+{function TServerLogger.isAnyMenuActive:boolean;
+begin
+  if isUnsentLogsActive or isLogsMenuActive then
+  begin
+    isLogsMenuActive := false;
+    result := true;
+  end;
+end;}
+
+procedure TServerLogger.IdTCPServer1Execute(AContext: TIdContext);
+var
+  str: string; log_list:TStringList;
+begin
+  str := AContext.Connection.IOHandler.ReadLn();
+
+  if iniIncoming then
+  begin
+    if str <> INI_END_LINE then
+    begin
+      log_list := TStringList.Create;
+      log_list.LoadFromFile(ini_path);
+      log_list.Add(str);
+      log_list.SaveToFile(ini_path);
+      log_list.Free;
+    end
+    else
+     iniIncoming := false;
+
+  end
+  else
+  try
+    log_list := TStringList.Create;
+    log_list.LoadFromFile(logs_path);
+    log_list.Add(str);
+    log_list.SaveToFile(logs_path);
+  finally
+    log_list.Free;
+  end;
+end;
+
+procedure TServerLogger.FormCreate(Sender: TObject);
+var
+  img:TPicture; list:TStringList;
+begin
+  img := TPicture.Create;
+  try
+    img.LoadFromFile(GetCurrentDir+'\img\background.bmp');
+    Background.Picture := img;
+  finally
+    img.Free;
+  end;
+
+  ini := TIniFile.Create(GetCurrentDir+'\config.ini');
+  ini_path := GetCurrentDir+'\config.ini';
+  logs := TIniFile.Create(GetCurrentDir+'\logs.log');
+  logs_path := GetCurrentDir+'\logs.log';
+
+  RegisterClass(TDateTimePicker);
+  isUnsentLogsActive := false;
+  iniIncoming := false;
+end;
+
+procedure TServerLogger.ReadIntoGrid(aSection: string;const aGrid: TStringGrid);
+var
+  SL: TStringList;
+  i: Integer;
+begin
+  SL := TStringList.Create;
+  try
+    aGrid.ColCount := 2;
+    logs.ReadSectionValues(aSection, SL);
+    aGrid.RowCount := SL.Count;
+    aGrid.ColWidths[0]:=100;
+    aGrid.ColWidths[1]:=500;
+    for i := 0 to SL.Count - 1 do
+    begin
+      aGrid.Cells[0,i] := SL.Names[i];
+      aGrid.Cells[1,i] := SL.ValueFromIndex[i];
+    end;
+
+  finally
+    SL.Free;
+  end;
+end;
+
+end.

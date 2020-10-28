@@ -1,0 +1,107 @@
+unit Logger;
+
+interface
+  uses IdTCPClient,IdComponent;
+  const
+    TCP_HOST_LOGGER = '127.0.0.1';
+    TCP_PORT_LOGGER = 9898;
+
+
+type
+
+  TLogger = class
+  private
+    LogTCPClient: TIdTCPClient;
+    connected: boolean;
+  public
+    constructor Create(host: string; port: integer);
+    procedure Write(const AFormat: string; const AArgs: array of const);
+    destructor Destroy; override;
+    procedure TCPStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);
+  end;
+    procedure debug_info(const AFormat: string; const AArgs: array of const);
+
+
+implementation
+uses sysutils, Forms, Startup;
+var
+  internal_logger: TLogger;
+
+  constructor TLogger.Create(host: string; port:integer);
+  const
+    BUF_LEN = 1000;
+  var
+    msg:string;
+    wideChars   : array[0..BUF_LEN] of WideChar;
+  begin
+    connected:=false;
+    LogTCPClient:= TIdTCPClient.create(nil);
+    LogTCPClient.OnStatus := TCPStatus;
+    LogTCPClient.port := port;
+    try
+      LogTCPClient.connect(host);
+    except
+      if isInilessStartOn then
+        raise Exception.Create('Logger offline on startup');
+
+      msg:=main_ini.ReadString(LANG,'LOGGER_OFFLINE_FAIL','LOG ERROR');
+      if length(msg) > BUF_LEN  then
+      begin
+          Application.MessageBox('INTERNAL ERROR 3 : STRINGA TROPPO LUNGA. Chiamare l''assistenza.', 'ERROR', 0);
+          Halt;
+      end;
+
+      StringToWideChar(msg,wideChars,BUF_LEN);
+      if (Application.MessageBox(wideChars , 'ERROR', 1)= 2) then
+        Application.Terminate;
+
+      freeAndNil(LogTCPClient);
+    end;
+
+  end;
+
+  procedure  TLogger.TCPStatus(ASender: TObject; const AStatus: TIdStatus; const AStatusText: string);     //TODO
+  begin
+    if AStatus = hsConnected then
+    begin
+      connected := true;
+      write('Start Logging ===========================',[]);
+    end
+    else
+      connected := false;
+  end;
+
+  procedure TLogger.Write(const AFormat: string; const AArgs: array of const);
+  var
+    s: string;
+  begin
+    if connected then
+    begin
+      s:=Format(AFormat,AArgs);
+      LogTCPClient.IOHandler.WriteLn(s);
+    end;
+  end;
+
+  destructor TLogger.Destroy;
+   begin
+     if connected then
+      begin
+        write('End Logging =======================',[]);
+        LogTCPClient.free;
+      end;
+   end;
+
+
+procedure debug_info(const AFormat: string; const AArgs: array of const);
+begin
+  internal_logger.Write(AFormat, AArgs);
+end;
+
+{initialization
+  internal_logger := TLogger.create(TCP_HOST_LOGGER, TCP_PORT_LOGGER);
+  debug_info('---debug internal logger----', []);
+
+finalization
+  freeAndNil(internal_logger);}
+
+end.

@@ -1,0 +1,20 @@
+unit Startup;
+
+interface
+uses System.IniFiles;
+var
+  main_ini:TINIFILE;
+implementation
+ uses sysutils, Ora;
+
+initialization
+   //TOraSQL.Create.SQL.Text := ';
+   main_ini:=TIniFile.Create(GetCurrentDir+'\config.ini');
+   if main_ini.readString('CONFIG', 'VALIDATE', '---') <> 'OK' then
+   begin
+     raise Exception.Create('File ini non valido, contattare l''assistenza');
+   end;
+
+finalization
+   FreeAndNil(main_ini);
+end.

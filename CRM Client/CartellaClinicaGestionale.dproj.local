@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2020/06/22 09:42:09.000.694,=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2020/07/03 10:57:02.000.747,=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2020/07/08 12:23:48.000.098,=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2020/07/08 12:26:52.000.110,C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\Unit1.dfm</Transaction>
+    <Transaction>2020/07/08 12:26:52.000.110,C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\Unit1.pas</Transaction>
+    <Transaction>2020/07/08 12:26:53.000.305,C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\Project1.dproj</Transaction>
+    <Transaction>2020/07/10 10:04:44.000.665,=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\New1.ini</Transaction>
+    <Transaction>2020/07/10 10:05:13.000.742,C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\New1.ini=C:\Users\WinDevVM\Documents\Embarcadero\Studio\Projects\Lezione 7\Win32\Debug\Project1.ini</Transaction>
+    <Transaction>2020/07/13 12:11:27.000.836,=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit2.pas</Transaction>
+    <Transaction>2020/07/13 12:12:05.000.124,C:\Users\PC\Documents\Embarcadero\Progetto Database\Logger.pas=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit1.pas</Transaction>
+    <Transaction>2020/07/13 12:12:05.000.124,C:\Users\PC\Documents\Embarcadero\Progetto Database\Logger.dfm=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit1.dfm</Transaction>
+    <Transaction>2020/07/13 12:12:21.000.682,C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit1.dfm=C:\Users\PC\Documents\Embarcadero\Progetto Database\Logger.dfm</Transaction>
+    <Transaction>2020/07/13 12:12:21.000.682,C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit1.pas=C:\Users\PC\Documents\Embarcadero\Progetto Database\Logger.pas</Transaction>
+    <Transaction>2020/07/13 12:12:26.000.912,C:\Users\PC\Documents\Embarcadero\Progetto Database\Logger.pas=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit2.pas</Transaction>
+    <Transaction>2020/07/14 11:34:51.000.094,C:\Users\PC\Documents\Embarcadero\Progetto Database\Project1.dproj=C:\Users\PC\Documents\Embarcadero\Progetto Database\CartellaClinicaGestionale.dproj</Transaction>
+    <Transaction>2020/07/15 10:15:17.000.482,=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit2.pas</Transaction>
+    <Transaction>2020/07/15 11:35:02.000.822,=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit2.pas</Transaction>
+    <Transaction>2020/07/15 11:35:09.000.138,C:\Users\PC\Documents\Embarcadero\Progetto Database\Startup.pas=C:\Users\PC\Documents\Embarcadero\Progetto Database\Unit2.pas</Transaction>
+  </Transactions>
+</BorlandProject>

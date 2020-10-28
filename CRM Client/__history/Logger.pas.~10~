@@ -1,0 +1,51 @@
+unit Logger;
+
+interface
+  uses IdTCPClient;
+  const TCP_PORT_LOGGER = 9898;
+type
+
+  TLogger = class
+  private
+    LogTCPClient: TIdTCPClient;
+  public
+    constructor Create(host: string; port: integer);
+    procedure Write(const AFormat: string; const AArgs: array of const);
+    destructor Destroy; override;
+  end;
+
+implementation
+
+uses sysutils;
+
+  constructor TLogger.Create(host: string; port: integer);
+  begin
+    LogTCPClient:= TIdTCPClient.Create(nil);
+    LogTCPClient.port := port;
+    LogTCPClient.connect(host);
+    write('Start Logging ==================================',[]);
+  end;
+
+  procedure TLogger.Write(const AFormat: string; const AArgs: array of const);
+  var
+    s: string;
+  begin
+    s:=Format(AFormat,AArgs);
+    LogTCPClient.IOHandler.WriteLn(s);
+  end;
+
+  destructor TLogger.Destroy;
+  begin
+    write('End Logging ====================================',[]);
+    LogTCPClient.free;
+  end;
+
+   (***
+initialization
+  Journal:=TJournal.Create(ExtractFilePath(Application.ExeName),
+                           ChangeFileExt(ExtractFilename(Application.ExeName),''),
+                           False,False,True,'127.0.0.1',514);
+finalization
+  Journal.Free;
+       ***)
+end.

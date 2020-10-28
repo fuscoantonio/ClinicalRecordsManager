@@ -1,0 +1,119 @@
+[LOGS]
+14-JUL-20 04.51.52.750916 PM = dump campi: id:  identificativo_primario: Identificativo Principale indirizzo_principale: Indirizzo citt??_principale: Citta' telefono: Telefono email: Email codice_fiscale: Codice Fiscale partita_iva: Partita Iva parente_id: 2 id_tipo: 4 nome: Nome data_nascita: 14-JUL-20 peso: 3
+14-JUL-20 04.52.18.559500 PM = dump campi: id:  identificativo_primario: Identificativo Principale indirizzo_principale: Indirizzo citt??_principale: Citta' telefono: Telefono email: Email codice_fiscale: Codice Fiscale partita_iva: Partita Iva parente_id: 5 id_tipo: 3 nome: Nome data_nascita: 14-JUL-20 peso: 23
+14-JUL-20 05.13.36.228151 PM = dump campi: id:  identificativo_primario: Identificativo Principale indirizzo_principale: Indirizzo citt??_principale: Citta' telefono: Telefono email: Email codice_fiscale: Codice Fiscale partita_iva: Partita Iva parente_id: 2 id_tipo: 33 nome: Nome data_nascita: 14-JUL-20 peso: 5
+Start Logging ==================================
+---debug internal logger----
+Start Logging ==================================
+---debug internal logger----
+End Logging ====================================
+---debug internal logger----
+End Logging ====================================
+14-JUL-20 08.23.00.781636 PM = 14-JUL-20 08.22.00.419923 PM=dump campi: id:  identificativo_primario: Rossi indirizzo_principale: Via Colle 4 citt??_principale: Milano telefono: 3345467888 email: mario.rossi@mail.it codice_fiscale: DHH82H8D2D partita_iva: 5453434535 parente_id: 4 id_tipo: 5 nome: Mario data_nascita: 15-JUN-88 peso: 67
+Start Logging ===========================
+Start Logging ===========================
+Start Logging ===========================
+Start Logging ===========================
+---debug internal logger----
+End Logging =======================
+Start Logging ===========================
+Start Logging ===========================
+---debug internal logger----
+End Logging =======================
+end_ini
+end_ini
+end_ini
+end_ini
+Start Logging ===========================
+end_ini
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+Start Logging ===========================
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+Start Logging ===========================
+End Logging =======================
+end_ini
+Start Logging ===========================
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+end_ini
+end_ini
+end_ini
+end_ini
+end_ini
+end_ini
+LOG_DATE =object log_date: TDateTimePicker    Left = 312    Top = 188    TabOrder = 8  end
+end_ini
+end_ini
+end_ini
+end_ini
+end_ini
+Start Logging ===========================
+end_ini
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+end_ini
+Start Logging ===========================
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+Start Logging ===========================
+end_ini
+End Logging =======================
+17-JUL-20 09:13:00,275360 = dsds
+17-JUL-20 09:13:16,396115 = logoff antonio: 
+17-JUL-20 09:13:25,675282 = logon antonio: 
+17-JUL-20 09.27.42.277769 AM = logon antonio: 
+Start Logging ===========================
+17-JUL-20 09.40.34.205272 AM = logon antonio: 
+17-JUL-20 09.40.41.595110 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 09.42.15.239172 AM = logon antonio: 
+17-JUL-20 09.42.22.865869 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 09.42.30.399347 AM = logon antonio: 
+17-JUL-20 09.42.32.713754 AM = logoff antonio: 
+17-JUL-20 09.44.48.812151 AM = logoff antonio: 
+17-JUL-20 09.44.51.225050 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 09.58.08.144918 AM = logon antonio: 
+17-JUL-20 09.58.13.455329 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 09.58.21.211286 AM = logon antonio: 
+17-JUL-20 09.58.23.708261 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 10.16.08.121765 AM = logon antonio: 
+17-JUL-20 10.18.55.325201 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 10.19.05.138065 AM = logon antonio: 
+17-JUL-20 10:21:21,855267 = logon antonio: 
+17-JUL-20 10.26.16.638713 AM = dump campi: id:  identificativo_primario:  indirizzo_principale:  citt??_principale:  telefono:  email:  codice_fiscale:  partita_iva:  parente_id:  id_tipo:  nome:  data_nascita:  peso: 
+17-JUL-20 10.26.27.598192 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 10.32.37.234571 AM = logon antonio: 
+End Logging =======================
+Start Logging ===========================
+17-JUL-20 10.35.22.394932 AM = logon antonio: 
+17-JUL-20 10.35.37.114947 AM = logoff antonio: 
+Start Logging ===========================
+17-JUL-20 10.36.45.628344 AM = logon antonio: 
+17-JUL-20 10.37.27.575138 AM = logoff antonio: 
+18-JUL-20 09.15.53.985576 AM = logon antonio: 
+Start Logging ===========================
+18-JUL-20 09.16.59.521731 AM = logon antonio: 
+18-JUL-20 09.29.03.613459 AM = logon antonio: 
+Start Logging ===========================
+20-JUL-20 01.37.40.883398 PM = logon antonio: 
+20-JUL-20 01.37.45.717190 PM = logoff antonio: 
+Start Logging ===========================
+End Logging =======================

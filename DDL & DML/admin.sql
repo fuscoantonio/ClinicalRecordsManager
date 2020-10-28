@@ -1,0 +1,1 @@
+grant execute on utl_http to antonio

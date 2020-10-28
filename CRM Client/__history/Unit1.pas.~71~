@@ -1,0 +1,267 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, DAScript, OraScript, Vcl.StdCtrls, Vcl.Grids, Vcl.DBGrids, MemDS,
+  DBAccess, Ora, OraCall, Vcl.ComCtrls,IniFiles, Vcl.Mask, Vcl.ExtCtrls,
+  IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient, Logger, Startup;
+{type
+  SQLType = (INSERT, SELECT);}
+
+type
+  TGestionaleCartellaClinica = class(TForm)
+    OraSession1: TOraSession;
+    OraQuery1: TOraQuery;
+    DataSource1: TDataSource;
+    InsertMenu: TButton;
+    OraSQL1: TOraSQL;
+    EnterButton: TButton;
+    SelectMenu: TButton;
+    Background: TImage;
+    Memo: TMemo;
+    procedure FormCreate(Sender: TObject);
+    destructor FormDestroy(Sender: TObject);
+    procedure InsertMenuClick(Sender: TObject);
+    procedure EnterButtonClick(Sender: TObject);
+    procedure ComponentsCreator(secName:string);
+    procedure ComponentsDestroyer;
+    procedure SQLGenerator(secname:string; keyName:string; hasParameters:boolean{; sqlType:SQLType});
+    function isAnyMenuActive:boolean;
+    procedure SelectMenuClick(Sender: TObject);
+
+  private
+    { Private declarations }
+    isInsertMenuActive:boolean;
+    isSelectMenuActive:boolean;
+    const
+      INSERT = 'INSERT';
+      INSERT_MENU = 'INSERTMENU';
+      SELECT_MENU = 'SELECTMENU';
+      INSERT_SQL = 'INSERTSQL';
+      INI_RESTORED = 'INI_RESTORED';
+  public
+    { Public declarations }
+  end;
+
+var
+  GestionaleCartellaClinica: TGestionaleCartellaClinica;
+
+implementation
+
+{$R *.dfm}
+function StringToComponentProc(Value: string): TComponent;
+var
+  StrStream:TStringStream;
+  BinStream:TMemoryStream;
+begin
+  StrStream := TStringStream.Create(Value);
+  try
+    BinStream := TMemoryStream.Create;
+    try
+      ObjectTextToBinary(StrStream, BinStream);
+      BinStream.Seek(0, soFromBeginning);
+      Result:= BinStream.ReadComponent(nil);
+    finally
+      BinStream.Free;
+    end;
+  finally
+    StrStream.Free;
+  end;
+end;
+
+procedure TGestionaleCartellaClinica.ComponentsCreator(secName:string);
+var
+  comp_list:TStringList; i:integer; comp:TControl;
+begin
+  comp_list := TStringList.Create;
+
+  try
+    main_ini.ReadSectionValues(secName, comp_list);
+
+    for i := 0 to comp_list.Count-1 do
+    begin
+      comp := StringToComponentProc(comp_list.ValueFromIndex[i]) as TControl;
+      comp.Parent := Self;
+      comp.Visible := TRUE;
+      self.InsertComponent(comp);
+    end;
+  finally
+    comp_list.Free;
+  end;
+
+end;
+
+procedure TGestionaleCartellaClinica.ComponentsDestroyer;
+var
+  i:integer; comp_list:TStringList;
+begin
+  comp_list := TStringList.Create;
+
+  try
+    for i := self.ComponentCount-1 downto 0 do
+    begin
+      if (self.Components[i] is TEdit) or (self.Components[i] is TDateTimePicker) then
+      begin
+        self.Components[i].Free;
+      end;
+    end;
+
+    EnterButton.Visible := false;
+  finally
+    comp_list.Free;
+  end;
+
+end;
+
+procedure TGestionaleCartellaClinica.InsertMenuClick(Sender: TObject);
+begin
+  if isInsertMenuActive then
+  begin
+    ComponentsDestroyer;
+    isInsertMenuActive := false;
+  end
+  else if isAnyMenuActive then
+  begin
+    ComponentsDestroyer;
+    isInsertMenuActive := true;
+    ComponentsCreator(INSERT_MENU);
+    EnterButton.Visible := true;
+  end
+  else
+  begin
+    isInsertMenuActive := true;
+    ComponentsCreator(INSERT_MENU);
+    EnterButton.Visible := true;
+  end;
+end;
+
+procedure TGestionaleCartellaClinica.SelectMenuClick(Sender: TObject);
+begin
+  if isSelectMenuActive then
+  begin
+    ComponentsDestroyer;
+    isSelectMenuActive := false;
+  end
+  else if isAnyMenuActive then
+  begin
+    ComponentsDestroyer;
+    isSelectMenuActive := true;
+    ComponentsCreator(SELECT_MENU);
+    EnterButton.Visible := true;
+  end
+  else
+  begin
+    isSelectMenuActive := true;
+    ComponentsCreator(SELECT_MENU);
+    EnterButton.Visible := true;
+  end;
+end;
+
+procedure TGestionaleCartellaClinica.SQLGenerator(secName:string; keyName:string; hasParameters:boolean{; sqlType:SQLType});
+var
+  i:integer; param:TParam; comp:TControl;
+begin
+  OraSQL1.SQL.Text := main_ini.ReadString(secName,keyName,'---');
+
+  if hasParameters then
+  begin
+    for i := 0 to self.ComponentCount-1 do
+    begin
+      if self.Components[i] is TControl then
+      begin
+        comp := self.Components[i] as TControl;
+        param := OraSQL1.Params.FindParam(comp.Name);
+      end;
+      if (self.components[i] is TEdit) and (param <> nil) then
+      begin
+        param.Value := (comp as TEdit).Text;
+      end
+      else if (self.Components[i] is TDateTimePicker) and (param <> nil) then
+      begin
+        param.AsDate := (comp as TDateTimePicker).Date
+      end;
+    end;
+  end;
+  OraSQL1.Execute;
+  OraSession1.Commit;
+
+  {case sqlType of
+    INSERT:
+      begin
+        OraSQL1.Execute;
+        OraSession1.Commit;
+      end;
+    SELECT:
+      begin
+        OraQuery1.SQL.Text := OraSQL1.SQL.Text;
+        OraQuery1.Params:= OraSQL1.Params;
+        OraQuery1.Close;
+        for i := 0 to OraSQL1.ParamCount-1 do
+        begin
+          memo1.lines.add(OraQuery1.Params[i].Value);
+        end;
+        memo1.Lines.Add(OraQuery1.SQL.Text);
+        OraQuery1.Open;
+      end;
+  end;}
+end;
+
+function TGestionaleCartellaClinica.isAnyMenuActive:boolean;
+begin
+  if isInsertMenuActive or isSelectMenuActive then
+  begin
+    isInsertMenuActive := false;
+    isSelectMenuActive := false;
+    result := true;
+  end;
+end;
+
+procedure TGestionaleCartellaClinica.EnterButtonClick(Sender: TObject);
+begin
+  //if isInsertMenuActive then
+    SQLGenerator(INSERT_SQL,INSERT,true)
+  {else
+    SQLGenerator('SELECTSQL','SELECT',true,SELECT);}
+end;
+
+procedure TGestionaleCartellaClinica.FormCreate(Sender: TObject);
+var
+  img:TPicture; host:string; port:integer;
+begin
+  img := TPicture.Create;
+  try
+    img.LoadFromFile(GetCurrentDir+'\img\background.bmp');
+    Background.Picture := img;
+  finally
+    img.Free;
+  end;
+
+  RegisterClass(TEdit);
+  RegisterClass(TDateTimePicker);
+
+  isInsertMenuActive := false;
+  isSelectMenuActive := false;
+
+  if isInilessStartOn then
+  begin
+    try
+      OraSQL1.SQL.Text := 'begin ini_util.download_ini_client; end;';
+      OraSQL1.Execute;
+      OraSession1.Commit;
+      isInilessStartOn := false;
+      Application.MessageBox('File ini ripristinato', 'MESSAGE', 0);
+    except
+      Application.MessageBox('INTERNAL ERROR 2: Non è stato possibile scaricare il file ini. Contattare l''assistenza.', 'ERROR', 0);
+      Halt;
+    end;
+  end;
+end;
+
+destructor TGestionaleCartellaClinica.FormDestroy(Sender: TObject);
+begin
+  //main_ini.Free;
+end;
+
+end.

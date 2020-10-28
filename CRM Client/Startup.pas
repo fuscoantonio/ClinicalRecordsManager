@@ -1,0 +1,44 @@
+unit Startup;
+
+interface
+uses System.IniFiles, Logger;
+var
+  main_ini: TINIFILE;
+  internal_logger: TLogger;
+  isInilessStartOn: boolean;
+  LANG: string;
+implementation
+ uses sysutils, Forms;
+ var
+  logger_host: string;
+  logger_port: integer;
+ 
+
+initialization
+  main_ini := TIniFile.Create(GetCurrentDir+'\config.ini');
+  LANG := 'ITA';
+  isInilessStartOn := false;
+
+  if main_ini.readString('CONFIG', 'VALIDATE', '---') <> 'OK' then
+  begin
+    try
+      Application.MessageBox('Ini file non valido. Verrà fatto un tentativo di scaricare il file ini corretto.', 'WARNING', 0);
+      isInilessStartOn := true;
+      internal_logger := TLogger.create(TCP_HOST_LOGGER, TCP_PORT_LOGGER);
+    except
+      Application.MessageBox('INTERNAL ERROR 1: Ini file non valido e logger offline. Chiamare l''assistenza.', 'ERROR', 0);
+      Halt;
+    end;
+  end
+  else
+  begin
+    logger_host := main_ini.readString('LOGGER', 'HOST', '---');
+    logger_port := StrToInt(main_ini.ReadString('LOGGER', 'PORT', '---'));
+    internal_logger := TLogger.create(logger_host, logger_port);
+  end;
+
+
+finalization
+  freeAndNil(internal_logger);
+  FreeAndNil(main_ini);
+end.

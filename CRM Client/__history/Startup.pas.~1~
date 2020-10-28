@@ -1,0 +1,14 @@
+unit Startup;
+
+interface
+uses System.IniFiles;
+var
+  main_ini:TINIFILE;
+implementation
+ uses sysutils;
+
+initialization
+   main_ini:=TIniFile.Create(GetCurrentDir+'\config.ini');
+finalization
+   FreeAndNil(main_ini);
+end.

@@ -1,0 +1,14 @@
+program LoggerServer;
+
+uses
+  Vcl.Forms,
+  Unit1 in 'Unit1.pas' {LoggerServer};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TLoggerServer, LoggerServer);
+  Application.Run;
+end.
